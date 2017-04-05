@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
+    <div id="player"></div>
+
+    <script>
+        // 2. This code loads the IFrame Player API code asynchronously.
+        var tag = document.createElement('script');
+
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        // 3. This function creates an <iframe> (and YouTube player)
+        //    after the API code downloads.
+        var player;
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                height: '390',
+                width: '640',
+                videoId: 'M7lc1UVf-VE',
+                playerVars: {
+                    controls: 0,
+                    disablekb: 1
+                },
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        // 4. The API will call this function when the video player is ready.
+        function onPlayerReady(event) {
+            event.target.playVideo();
+            console.log(player.getPlayerState());
+        }
+
+        // 5. The API calls this function when the player's state changes.
+        //    The function indicates that when playing a video (state=1),
+        //    the player should play for six seconds and then stop.
+        var done = false;
+        function onPlayerStateChange(event) {
+            if (event.data == YT.PlayerState.PLAYING && !done) {
+                //setTimeout(stopVideo, 6000);
+                //done = true;
+            }
+        }
+        function stopVideo() {
+            player.stopVideo();
+        }
+
+        function GetVideoStatus() {
+            switch (player.getPlayerState()) {
+                case -1:
+                    alert("Unstarted");
+                    break;
+                case 0:
+                    alert("Ended");
+                    break;
+                case 1:
+                    alert("Playing");
+                    break;
+                case 2:
+                    alert("Paused");
+                    break;
+                case 3:
+                    alert("Buffering");
+                    break;
+                case 5:
+                    alert("Video Cued");
+                    break;
+            }
+        }
+
+        function getCurrentTime() {
+            alert(parseInt(player.getCurrentTime()) + " seconds");
+        }
+
+        function getDuration() {
+            alert(parseInt((parseInt(player.getDuration()) / 60)) + " Minutes");
+        }
+
+        function getVideoLoadedFraction() {
+            alert(parseInt(player.getVideoLoadedFraction() * 100) + "% Loaded");
+        }
+
+        function GetTotalPercentageOfPlay() {
+            setInterval(function () {
+                var totalDuration = player.getDuration(); //second
+                var currentDuration = player.getCurrentTime(); //second
+                var totalPercentage = (currentDuration * 100) / totalDuration;
+                alert(parseInt(totalPercentage) + "% Watched.");
+            }, 10000);
+        }
+
+    </script><br />
+    <input type="button" value="Get Video Status" onclick="GetVideoStatus()" />
+    <input type="button" value="Get Played Time" onclick="getCurrentTime()" />
+    <input type="button" value="Get Video Duration" onclick="getDuration()" />
+    <input type="button" value="Get Buffered Video Percentage" onclick="getVideoLoadedFraction()" />
+    <input type="button" value="Watching video percentage" onclick="GetTotalPercentageOfPlay()" />
+
+</body>
+</html>
