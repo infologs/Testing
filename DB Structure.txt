@@ -1,0 +1,41 @@
+Registration
+	RegistrationID
+	FirstName
+	LastName
+	EmailID
+	Password
+	MobileNo
+
+AccountDetails
+	AccountID
+	RegistrationID
+	AccountNo
+	BankName
+	IFSCCode
+
+Advertisement
+	AdvertID
+	AdvertDisplayText
+	AdvertURL
+	AdvertType
+	CompletionTime
+	AdvertRate
+
+AdvertisementCompletion
+	AdvertCompletionID
+	AdvertID
+	RegistrationID
+	IsComplete
+	AdvertIPAddress
+	DateTime
+
+Payment
+	PaymentID
+	AccountID
+	RegistrationID
+	Amount
+	DateTime
+
+	
+	
+	
