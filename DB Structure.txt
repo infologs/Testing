@@ -1,39 +1,43 @@
 Registration
-	RegistrationID
+	UserID
 	FirstName
 	LastName
 	EmailID
 	Password
 	MobileNo
-
-AccountDetails
-	AccountID
-	RegistrationID
-	AccountNo
-	BankName
-	IFSCCode
+	DateTime
 
 Advertisement
-	AdvertID
+	AdvertisementID
 	AdvertDisplayText
 	AdvertURL
 	AdvertType
 	CompletionTime
 	AdvertRate
+	DateTime
 
 AdvertisementCompletion
 	AdvertCompletionID
-	AdvertID
-	RegistrationID
+	AdvertisementID
+	UniqueID
+	UserID
 	IsComplete
-	AdvertIPAddress
+	DeviceIPAddress
 	DateTime
 
-Payment
-	PaymentID
+AccountDetails
 	AccountID
-	RegistrationID
-	Amount
+	UserID
+	AccountNo
+	BankName
+	IFSCCode
+	DateTime
+
+PaymentInformation
+	PaymentID
+	UserID
+	TotalAmount
+	IsPaymentDone
 	DateTime
 
 	
