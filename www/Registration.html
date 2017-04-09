@@ -1,0 +1,88 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            $("#btnLogin").click(function () {
+                window.location.href = "Login.html";
+            })
+
+            $("#btnRegister").click(function () {
+                var emailid = $("#txtEmailID").val();
+                var password = $("#txtPassword").val();
+                var confpassword = $("#txtConfPassword").val();
+                var mobileno = $("#txtMobileNo").val();
+
+                if (emailid.length > 0) {
+                    if (password.length > 0) {
+                        if (confpassword.length > 0) {
+                            if (password == confpassword) {
+                                if (mobileno.length == 10) {
+                                    var details = {};
+                                    details.EmailID = emailid;
+                                    details.Password = password;
+                                    details.MobileNo = mobileno;
+
+                                    $.ajax({
+                                        url: "http://infologs.in/revenue/registration.php",
+                                        type: "POST",
+                                        dataType: "json",
+                                        data: details,
+                                        ContentType: "application/json",
+                                        success: function (respose) {
+                                            alert(respose.Message);
+                                        },
+                                        error: function (err) {
+                                            alert("Error while requesting");
+                                            console.log(err);
+                                        }
+                                    })
+                                } else {
+                                    alert("please enter valid mobile no.");
+                                }
+                            } else {
+                                alert("password and confirm password does not matched");
+                            }
+                        } else {
+                            alert("Please enter confirm password");
+                        }
+                    } else {
+                        alert("Please enter password");
+                    }
+                } else {
+                    alert("Please enter email id");
+                }
+
+            });
+        });
+    </script>
+</head>
+<body>
+    <table width="100%" align="left">
+        <tr>
+            <th width="30%">EmailID:</th>
+            <td><input type="text" id="txtEmailID" placeholder="Email ID" /></td>
+        </tr>
+        <tr>
+            <th>Password:</th>
+            <td><input type="text" id="txtPassword" placeholder="Password" /></td>
+        </tr>
+        <tr>
+            <th>Confirm Password:</th>
+            <td><input type="text" id="txtConfPassword" placeholder="Confirm password" /></td>
+        </tr>
+        <tr>
+            <th>Mobile No:</th>
+            <td><input type="text" id="txtMobileNo" placeholder="Mobile no" /></td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center">
+                <input type="submit" id="btnRegister" value="Register" />&nbsp;<input id="btnLogin" type="submit" value="Login" />
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

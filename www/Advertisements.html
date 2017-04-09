@@ -1,0 +1,158 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script>
+        var globalVideoReff;
+        $(document).ready(function () {
+
+            $("#btnLogout").click(function () {
+                window.location.href = "Login.html";
+            });
+
+            $("#btnGoBack").click(function () {
+                $("#dvVideo").hide();
+                $("#dvAdList").show();
+
+                var totalDuration = player.getDuration(); //second
+                var currentDuration = player.getCurrentTime(); //second
+                var totalPercentage = (currentDuration * 100) / totalDuration;
+
+                if (parseInt($(globalVideoReff).attr("data-time")) > parseInt(totalPercentage)) {
+                    player.stopVideo();
+                    alert("Unsuccessfull earning");                    
+                } else {
+                    alert("Link review completed successfully");
+                    $(globalVideoReff).closest("div").css("pointer-events", "none");
+                    $(globalVideoReff).closest("div").css("opacity", "0.3");
+
+                    //send completion request
+
+                }
+
+            });
+
+            var details = {};
+            details.UserID = sessionStorage.UserID;
+            $.ajax({
+                url: "http://infologs.in/revenue/advertisement.php",
+                type: "POST",
+                dataType: "json",
+                data: details,
+                ContentType: "application/json",
+                success: function (respose) {
+                    if (respose) {
+                        var response = respose;
+                        var strAds = "";
+                        for (var i = 0; i < response.Advertisement.length; i++) {
+                            strAds += "<tr>";
+                            strAds += "<td><div style='border-bottom:1px groove #000;'>";
+                            strAds += "<a onclick='javascript:ClickOnAds(this);' data-url='" + response.Advertisement[i].AdvertisementURL +
+                                "' data-adtype='" + response.Advertisement[i].AdvertisementType +
+                                "' data-time='" + response.Advertisement[i].AdvertisementCompletionType +
+                                "' data-adrate = '" + response.Advertisement[i].AdvertisementRate + "'>" +
+                                    "<h3 style='padding:0; margin:0;'>Title: " + response.Advertisement[i].AdvertisementDisplayText + "</h3>" +
+                                    "<div>Ad Type: " + response.Advertisement[i].AdvertisementType + "</div>" +
+                                    "<div style='float:right;'>Completion Time: " + response.Advertisement[i].AdvertisementCompletionType + "</div><div style='clear:both'></div>" +
+                                    "<div style='float:right;'>Ad Rate: " + response.Advertisement[i].AdvertisementRate + "</div><div style='clear:both'></div>"
+                                + "</a>";
+                            strAds += "</div></td>";
+                            strAds += "</tr>";
+                        }
+                        $("#tblAdvertisements").html(strAds);
+                    }
+                },
+                error: function (err) {
+                    alert("Error while requesting");
+                    console.log(err);
+                }
+            });
+        });
+
+        function ClickOnAds(ctrlReff) {
+            var startStamp = new Date();
+
+            if ($(ctrlReff).attr("data-adtype") == "Website" || $(ctrlReff).attr("data-adtype") == "Blog") {
+
+                WindowRefferenece = cordova.InAppBrowser.open($(ctrlReff).attr("data-url"), '_blank', 'location=yes');
+
+                WindowRefferenece.addEventListener("loadstart", function (result) {
+                    console.log(result);
+                });
+                WindowRefferenece.addEventListener("loadstop", function (result) {
+                    console.log(result);
+                });
+                WindowRefferenece.addEventListener("loaderror", function (result) {
+                    console.log(result);
+                });
+                WindowRefferenece.addEventListener("exit", function (result) {
+                    console.log(result);
+                    var EndStamp = new Date();
+                    var totalTime = ((EndStamp - startStamp) / 1000);
+                    console.log("Time Spend : " + totalTime + " second");
+                    if (parseInt($(ctrlReff).attr("data-time")) > parseInt(totalTime)) {
+                        alert("Unsuccessfull earning");
+                    } else {
+                        alert("Link review completed successfully");
+                        $(ctrlReff).closest("div").css("pointer-events", "none");
+                        $(ctrlReff).closest("div").css("opacity", "0.3");
+
+                        //send completion request
+
+                    }
+                });
+            } else {
+                globalVideoReff = ctrlReff;
+                $("#dvVideo").show();
+                $("#dvAdList").hide();
+
+                var position = $("script")[0].getAttribute("src").indexOf("iframe_api");
+
+                if (position == -1) {
+                    var tag = document.createElement('script');
+                    tag.src = "https://www.youtube.com/iframe_api";
+                    var firstScriptTag = document.getElementsByTagName('script')[0];
+                    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+                }
+            }
+        }
+
+        var player;
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                height: '280',
+                width: '100%',
+                videoId: 'M7lc1UVf-VE',
+                playerVars: {
+                    controls: 0,
+                    disablekb: 1
+                },
+                events: {
+                    'onReady': onPlayerReady
+                    /*'onStateChange': onPlayerStateChange*/
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            //event.target.playVideo();
+            //console.log(player.getPlayerState());
+        }
+       
+    </script>
+</head>
+<body style="padding:0; margin:0;">
+    <div id="dvAdList">
+        <table id="tblAdvertisements" width="100%">
+
+        </table>
+        <input type="button" value="Logout" id="btnLogout" />
+    </div>
+    <div id="dvVideo" style="display:none;">
+        <div id="player"></div><br/>
+        <input type="button" value="Go Back" id="btnGoBack" />
+    </div>    
+</body>
+</html>

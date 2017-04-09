@@ -1,0 +1,64 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#btnRegister").click(function () {
+                window.location.href = "Registration.html";
+            });
+
+            $("#btnLogin").click(function () {
+                var emailid = $("#txtEmailID").val();
+                var password = $("#txtPassword").val();
+
+                if (emailid.length > 0) {
+                    if (password.length > 0) {
+                        var details = {};
+                        details.EmailID = emailid;
+                        details.Password = password;
+                        $.ajax({
+                            url: "http://infologs.in/revenue/authentication.php",
+                            type: "POST",
+                            dataType: "json",
+                            data: details,
+                            ContentType: "application/json",
+                            success: function (respose) {
+                                sessionStorage.UserID = respose.UserID;
+                                window.location.href = "Advertisements.html";
+                            },
+                            error: function (err) {
+                                alert("Error while requesting");
+                                console.log(err);
+                            }
+                        })
+                    } else {
+                        alert("Please enter password");
+                    }
+                } else {
+                    alert("Please enter email id or password");
+                }
+            });
+    });
+    </script>
+</head>
+<body>
+    <table width="100%" align="left">
+        <tr>
+            <th width="30%">EmailID / MobileNo:</th>
+            <td><input type="text" id="txtEmailID" value="abhishekbedre@gmail.com" placeholder="Email ID or Mobile No" /></td>
+        </tr>
+        <tr>
+            <th>Password:</th>
+            <td><input type="text" id="txtPassword" placeholder="Password" value="123" /></td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center">
+                <input id="btnLogin" type="submit" value="Login" />&nbsp;<input type="submit" id="btnRegister" value="Register" />
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
