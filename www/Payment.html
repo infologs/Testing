@@ -1,0 +1,84 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            var details = {};
+            details.UserID = sessionStorage.UserID;
+            $.ajax({
+                url: "http://infologs.in/revenue/paymentinformation.php",
+                type: "POST",
+                dataType: "json",
+                data: details,
+                ContentType: "application/json",
+                success: function (response) {
+                    if (response) {
+                        if (response.PaymentList) {
+                            var strData = "";
+                            for (var i = 0; i < response.PaymentList.length; i++) {
+                                strData += "<tr>";
+                                strData += "<td><div style='border-bottom:1px groove red;'><div>Payment ID: " + response.PaymentList[i].PaymentID + "</div>" +
+                                    "<div>TotalAmount : " + response.PaymentList[i].TotalAmount + "</div>" +
+                                    "<div>Payment Done : " + response.PaymentList[i].IsPaymentDone + "</div>"
+                                    +"</div></td>";
+                                strData += "</tr>";
+                            }
+
+                            $("#tblPaymentInfo").html(strData);
+
+                        }
+                    }
+                },
+                error: function (e) {
+                    alert("error");
+                    console.log(e);
+                }
+            });
+
+            $("#btnRequestPayment").click(function () {
+
+                var earnMoney = $("#EarnMoney").html();
+
+                var details = {};
+                details.UserID = sessionStorage.UserID;
+                details.TotalAmount = earnMoney;
+                details.IsPaymentDone = 0;
+
+                $.ajax({
+                    url: "http://infologs.in/revenue/paymentinformation.php",
+                    type: "POST",
+                    dataType: "json",
+                    data: details,
+                    ContentType: "application/json",
+                    success: function (response) {
+                        if (response) {
+                            alert(response.Message);
+                        }
+                    },
+                    error: function (e) {
+                        alert("Error");
+                        console.log(e);
+                    }
+                });
+            });
+
+            $("#btnGoBack").click(function () {
+                window.location.href = "Advertisements.html";
+            });
+        });
+    </script>
+</head>
+<body>
+    <table width="100%" id="tblPaymentInfo" align="left">
+        
+    </table>
+    <center>
+        <h3 id="EarnMoney">500</h3>
+    </center>
+    <input type="submit" value="Send Payment Request" id="btnRequestPayment" />
+    <input type="submit" value="Go Back" id="btnGoBack" />
+</body>
+</html>

@@ -1,0 +1,137 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            var details = {};
+            details.UserID = sessionStorage.UserID;
+            $.ajax({
+                url: "http://infologs.in/revenue/registration.php",
+                type: "POST",
+                dataType: "json",
+                data: details,
+                ContentType: "application/json",
+                success: function (response) {
+                    if (response) {
+                        if (response.UserInfo) {
+                            $("#txtFirstname").val(response.UserInfo.FirstName);
+                            $("#txtLastname").val(response.UserInfo.LastName);
+                            $("#txtEmailID").val(response.UserInfo.EmailID);
+                            $("#txtPassword").val(response.UserInfo.Password);
+                            $("#txtConfPassword").val(response.UserInfo.Password);
+                            $("#txtMobileNo").val(response.UserInfo.MobileNo);
+                        }
+                    }
+                },
+                error: function (e) {
+                    alert("Error");
+                    console.log(e);
+                }
+            });
+
+            $("#btnUpdateProfile").click(function () {
+                var emailid = $("#txtEmailID").val();
+                var password = $("#txtPassword").val();
+                var confpassword = $("#txtConfPassword").val();
+                var mobileno = $("#txtMobileNo").val();
+                var firstname = $("#txtFirstname").val();
+                var lastname = $("#txtLastname").val();
+
+                if (firstname.length > 0) {
+
+                    if (lastname.length > 0) {
+
+                        if (emailid.length > 0) {
+                            if (password.length > 0) {
+                                if (confpassword.length > 0) {
+                                    if (password == confpassword) {
+                                        if (mobileno.length == 10) {
+                                            var details = {};
+                                            details.EmailID = emailid;
+                                            details.Password = password;
+                                            details.MobileNo = mobileno;
+                                            details.IsForUpdate = 1;
+                                            details.FirstName = firstname;
+                                            details.LastName = lastname;
+
+                                            $.ajax({
+                                                url: "http://infologs.in/revenue/registration.php",
+                                                type: "POST",
+                                                dataType: "json",
+                                                data: details,
+                                                ContentType: "application/json",
+                                                success: function (respose) {
+                                                    alert(respose.Message);
+                                                },
+                                                error: function (err) {
+                                                    alert("Error while requesting");
+                                                    console.log(err);
+                                                }
+                                            })
+                                        } else {
+                                            alert("please enter valid mobile no.");
+                                        }
+                                    } else {
+                                        alert("password and confirm password does not matched");
+                                    }
+                                } else {
+                                    alert("Please enter confirm password");
+                                }
+                            } else {
+                                alert("Please enter password");
+                            }
+                        } else {
+                            alert("Please enter email id");
+                        }
+                    } else {
+                        alert("Please enter last name.");
+                    }
+                } else {
+                    alert("Please enter first name.");
+                }
+
+            });
+
+            $("#btnGoBack").click(function () {
+                window.location.href = "Advertisements.html";
+            });
+        });
+    </script>
+</head>
+<body>
+    <table width="100%" align="left">
+        <tr>
+            <th>First Name:</th>
+            <td><input type="text" id="txtFirstname" placeholder="First name" /></td>
+        </tr>
+        <tr>
+            <th>Last Name:</th>
+            <td><input type="text" id="txtLastname" placeholder="Last name" /></td>
+        </tr>
+        <tr>
+            <th width="30%">EmailID:</th>
+            <td><input type="text" id="txtEmailID" placeholder="Email ID" /></td>
+        </tr>
+        <tr>
+            <th>Password:</th>
+            <td><input type="text" id="txtPassword" placeholder="Password" /></td>
+        </tr>
+        <tr>
+            <th>Confirm Password:</th>
+            <td><input type="text" id="txtConfPassword" placeholder="Confirm password" /></td>
+        </tr>
+        <tr>
+            <th>Mobile No:</th>
+            <td><input type="text" id="txtMobileNo" placeholder="Mobile no" /></td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center">
+                <input type="submit" id="btnUpdateProfile" value="Update Info" />&nbsp;<input id="btnGoBack" type="submit" value="Go Back" />
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

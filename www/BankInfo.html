@@ -1,0 +1,116 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+             
+            var details = {};
+            details.UserID = sessionStorage.UserID;
+            details.GetbankInfo = 1;
+
+            $.ajax({
+                url: "http://infologs.in/revenue/bankaccountinfo.php",
+                type: "POST",
+                dataType: "json",
+                data: details,
+                ContentType: "application/json",
+                success: function (response) {
+                    if (response) {
+                        if (response.BankAccountInfo) {
+                            $("#txtAccountNo").val(response.BankAccountInfo.AccountNo);
+                            $("#txtBankname").val(response.BankAccountInfo.BankName);
+                            $("#txtIFSCCode").val(response.BankAccountInfo.IFSCCode);
+                            $("#lblLastUpdate").html("Last Updated On: " + response.BankAccountInfo.DateTime);
+                        }
+                    }
+                },
+                error: function (e) {
+                    alert("error");
+                    console.log(e);
+                }
+            });
+
+            $("#btnUpdateBank").click(function () {
+                var AccountNo = $("#txtAccountNo").val();
+                var BankName = $("#txtBankname").val();
+                var IFSCCode = $("#txtIFSCCode").val();
+
+                if (AccountNo.length > 0) {
+                    if (BankName.length > 0) {
+                        if (IFSCCode.length > 0) {
+                            var details = {};
+                            details.UserID = sessionStorage.UserID;
+                            details.AccountNo = AccountNo;
+                            details.Bankname = BankName;
+                            details.IFSCCode = IFSCCode;
+                            details.DateTime = new Date().toJSON();
+
+                            $.ajax({
+                                url: "http://infologs.in/revenue/bankaccountinfo.php",
+                                type: "POST",
+                                dataType: "json",
+                                data: details,
+                                ContentType: "application/json",
+                                success: function (response) {
+                                    if (response) {
+                                        alert(response.Message);
+                                    }
+                                },
+                                error: function (e) {
+                                    alert("Error");
+                                    alert(e);
+                                }
+                            });
+                        } else {
+                            alert("Please enter IFSC Code.");
+                        }
+                    } else {
+                        alert("Please enter Bank name.");
+                    }
+                } else {
+                    alert("Please enter Account No");
+                }
+            });
+
+            $("#btnGoBack").click(function () {
+                window.location.href = "Advertisements.html";
+            });
+        });
+    </script>
+</head>
+<body>
+    <table width="100%">
+        <tr>
+            <th>Account No:</th>
+            <td>
+                <input type="text" value="" id="txtAccountNo" />
+            </td>
+        </tr>
+        <tr>
+            <th>Bank Name:</th>
+            <td>
+                <input type="text" value="" id="txtBankname" />
+            </td>
+        </tr>
+        <tr>
+            <th>IFSC Code:</th>
+            <td>
+                <input type="text" value="" id="txtIFSCCode" />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <label id="lblLastUpdate"></label>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center">
+                <input type="submit" id="btnUpdateBank" value="Update Bank Information" />&nbsp;<input type="button" value="Go Back" id="btnGoBack" />
+            </td>
+        </tr>        
+    </table>
+</body>
+</html>

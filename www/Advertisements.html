@@ -6,33 +6,19 @@
     <script type="text/javascript" src="js/jquery.min.js"></script>
     <script>
         var globalVideoReff;
+
+        function UniqueID() {
+            var text = "";
+            var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+            for (var i = 0; i < 10; i++)
+                text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+            return text;
+        }
+
+
         $(document).ready(function () {
-
-            $("#btnLogout").click(function () {
-                window.location.href = "Login.html";
-            });
-
-            $("#btnGoBack").click(function () {
-                $("#dvVideo").hide();
-                $("#dvAdList").show();
-
-                var totalDuration = player.getDuration(); //second
-                var currentDuration = player.getCurrentTime(); //second
-                var totalPercentage = (currentDuration * 100) / totalDuration;
-
-                if (parseInt($(globalVideoReff).attr("data-time")) > parseInt(totalPercentage)) {
-                    player.stopVideo();
-                    alert("Unsuccessfull earning");                    
-                } else {
-                    alert("Link review completed successfully");
-                    $(globalVideoReff).closest("div").css("pointer-events", "none");
-                    $(globalVideoReff).closest("div").css("opacity", "0.3");
-
-                    //send completion request
-
-                }
-
-            });
 
             var details = {};
             details.UserID = sessionStorage.UserID;
@@ -49,7 +35,7 @@
                         for (var i = 0; i < response.Advertisement.length; i++) {
                             strAds += "<tr>";
                             strAds += "<td><div style='border-bottom:1px groove #000;'>";
-                            strAds += "<a onclick='javascript:ClickOnAds(this);' data-url='" + response.Advertisement[i].AdvertisementURL +
+                            strAds += "<a onclick='javascript:ClickOnAds(this);' data-adid='" + response.Advertisement[i].AdvertisementID + "' data-url='" + response.Advertisement[i].AdvertisementURL +
                                 "' data-adtype='" + response.Advertisement[i].AdvertisementType +
                                 "' data-time='" + response.Advertisement[i].AdvertisementCompletionType +
                                 "' data-adrate = '" + response.Advertisement[i].AdvertisementRate + "'>" +
@@ -69,10 +55,70 @@
                     console.log(err);
                 }
             });
+
+
+            $("#btnLogout").click(function () {
+                window.location.href = "Login.html";
+            });
+
+            $("#btnGoBack").click(function () {
+                $("#dvVideo").hide();
+                $("#dvAdList").show();
+
+                var totalDuration = player.getDuration(); //second
+                var currentDuration = player.getCurrentTime(); //second
+                var totalPercentage = (currentDuration * 100) / totalDuration;
+
+                if (parseInt($(globalVideoReff).attr("data-time")) > parseInt(currentDuration)) {
+                    player.stopVideo();
+                    alert("Unsuccessfull earning");
+                } else {                                      
+
+                    var details = {};
+                    details.UniqueID = UniqueID();
+                    details.UserID = sessionStorage.UserID;
+                    details.AdvertisementID = sessionStorage.AdvertisementID;
+                    details.DeviceIPAddress = "192.168.100.100";
+                    details.DateTime = new Date().toJSON();
+
+                    //send completion request
+                    $.ajax({
+                        url: "http://infologs.in/revenue/completeAdvertise.php",
+                        type: "POST",
+                        dataType: "json",
+                        data: details,
+                        ContentType: "application/json",
+                        success: function (respose) {
+                            $(globalVideoReff).closest("div").css("pointer-events", "none");
+                            $(globalVideoReff).closest("div").css("opacity", "0.3");
+                            alert(respose.Message);
+                        },
+                        error: function (e) {
+                            alert("Error");
+                            console.log(e);
+                        }
+                    });
+                }
+            });
+
+            $("#btnUpdateBankInfo").click(function () {
+
+                window.location.href = "BankInfo.html";
+            });
+
+            $("#btnPaymentInfo").click(function () {
+                window.location.href = "Payment.html";
+            });
+
+            $("#btnProfile").click(function () {
+                window.location.href = "Profile.html";
+            });
         });
 
         function ClickOnAds(ctrlReff) {
             var startStamp = new Date();
+
+            sessionStorage.AdvertisementID = $(ctrlReff).attr("data-adid");
 
             if ($(ctrlReff).attr("data-adtype") == "Website" || $(ctrlReff).attr("data-adtype") == "Blog") {
 
@@ -95,18 +141,42 @@
                     if (parseInt($(ctrlReff).attr("data-time")) > parseInt(totalTime)) {
                         alert("Unsuccessfull earning");
                     } else {
-                        alert("Link review completed successfully");
-                        $(ctrlReff).closest("div").css("pointer-events", "none");
-                        $(ctrlReff).closest("div").css("opacity", "0.3");
+                        
+                        //send completion request
+                        var details = {};
+                        details.UniqueID = UniqueID();
+                        details.UserID = sessionStorage.UserID;
+                        details.AdvertisementID = sessionStorage.AdvertisementID;
+                        details.DeviceIPAddress = "192.168.100.100";
+                        details.DateTime = new Date().toJSON();
+
 
                         //send completion request
-
+                        $.ajax({
+                            url: "http://infologs.in/revenue/completeAdvertise.php",
+                            type: "POST",
+                            dataType: "json",
+                            data: details,
+                            ContentType: "application/json",
+                            success: function (respose) {
+                                $(ctrlReff).closest("div").css("pointer-events", "none");
+                                $(ctrlReff).closest("div").css("opacity", "0.3");
+                                alert(respose.Message);
+                            },
+                            error: function (e) {
+                                alert("Error");
+                                console.log(e);
+                            }
+                        });
                     }
                 });
             } else {
                 globalVideoReff = ctrlReff;
                 $("#dvVideo").show();
                 $("#dvAdList").hide();
+
+
+
 
                 var position = $("script")[0].getAttribute("src").indexOf("iframe_api");
 
@@ -122,7 +192,7 @@
         var player;
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('player', {
-                height: '280',
+                height: '260',
                 width: '100%',
                 videoId: 'M7lc1UVf-VE',
                 playerVars: {
@@ -139,6 +209,14 @@
         function onPlayerReady(event) {
             //event.target.playVideo();
             //console.log(player.getPlayerState());
+            setInterval(function () {
+                var totalDuration = player.getDuration(); //second
+                var currentDuration = player.getCurrentTime(); //second
+                var totalPercentage = (currentDuration * 100) / totalDuration;
+                //alert(parseInt(totalPercentage) + "% Watched.");
+                //$("#spnPercentage").html(totalPercentage.toFixed(2) + "% watched");
+                $("#spnPercentage").html(parseInt(currentDuration) + " seconds watched");
+            }, 1000);
         }
        
     </script>
@@ -148,11 +226,14 @@
         <table id="tblAdvertisements" width="100%">
 
         </table>
-        <input type="button" value="Logout" id="btnLogout" />
+        <input type="button" value="Logout" id="btnLogout" />&nbsp;
+        <input type="button" value="Update Bank Info" id="btnUpdateBankInfo" />
+        <input type="button" value="Payment Info" id="btnPaymentInfo" />
+        <input type="button" value="User Info" id="btnProfile" />
     </div>
     <div id="dvVideo" style="display:none;">
         <div id="player"></div><br/>
-        <input type="button" value="Go Back" id="btnGoBack" />
+        <input type="button" value="Go Back" id="btnGoBack" /> <span id="spnPercentage"></span><br />        
     </div>    
 </body>
 </html>
